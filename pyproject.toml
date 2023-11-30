@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "movie_analysis"
+name = "biogic_analysis"
 version = "0.1.0"
 description = "An analysis of diversity in biopics."
 authors = ["Qing Dou <qdou@mail.yu.edu>"]
@@ -13,7 +13,7 @@ numpy = "^1.21"
 pandas = "^1.3"
 seaborn = "^0.11"
 matplotlib = "^3.4"
-IPython = "^8.17.2"
+requests = "^2.25.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2"
