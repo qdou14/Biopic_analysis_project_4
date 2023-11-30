@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "airbnb_analysis"
+name = "movie_analysis"
 version = "0.1.0"
 description = "An analysis of diversity in biopics."
 authors = ["Qing Dou <qdou@mail.yu.edu>"]
