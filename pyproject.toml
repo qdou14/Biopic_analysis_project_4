@@ -22,7 +22,7 @@ pytest = "^6.2"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"biogic_analysis" = ["*"]
+biogic_analysis = ["*"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
