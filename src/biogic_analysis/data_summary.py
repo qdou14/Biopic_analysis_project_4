@@ -100,7 +100,23 @@ class DataProcess:
         return self.data
     
     def add_category(self):
+        """
+        Adds a new 'category' column to the DataFrame based on 'subject_race' and 'subject_sex' columns.
+
+        This method applies a categorization function to each row of the DataFrame. The category is determined 
+        by the race and sex of the subject. The categories include 'White Male', 'White Female', 
+        'Non-White Male', 'Non-White Female', or 'Unknown'. If the race is missing, the category is set as pd.NA.
+
+        The new column 'category' is appended to the existing DataFrame.
+
+        Parameters:
+            self: Instance of the class containing the DataFrame.
+
+        Returns:
+            None: The method directly modifies the instance's DataFrame by adding a new column.
+        """
         def categorize(row):
+            # Internal function to determine the category of a given row
             if pd.isna(row['subject_race']):
                 return pd.NA  
             elif row['subject_race'] == 'White':
@@ -115,6 +131,7 @@ class DataProcess:
                     return 'Non-White Female'
             return 'Unknown' 
 
+        # Apply the categorize function to each row and create a new column 'category'
         self.data['category'] = self.data.apply(categorize, axis=1)
 
     def get_shape(self):

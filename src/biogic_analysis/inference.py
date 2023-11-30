@@ -13,7 +13,6 @@ class Inference:
 
     Methods:
     bechdel_test_plot(subject_col, bechdel_col): Generates a horizontal bar plot showing the percentage of movies that pass or fail the Bechdel test by specified subject categories.
-    bechdel_category_boxplot(category_col, bechdel_col): Creates a box plot to analyze the distribution of Bechdel test ratings across different categories.
     proportion_in_top_box_office(column, hue): Displays a side-by-side bar chart showing the proportion of movies in top box office categorized by specified column and hue.
     box_office_diversity_correlation(): Visualizes the correlation between diversity categories and box office performance using scatter plots.
     diversity_trends_over_time(): Analyzes and visualizes the trends in movie diversity over time with line plots.
@@ -64,39 +63,22 @@ class Inference:
         plt.legend(title='Bechdel test', loc='lower right')
         plt.gca().invert_yaxis()  # To match the example's layout
         plt.show()
-
-    def bechdel_category_boxplot(self, category_col='category', bechdel_col='type_of_subject'):
-        """
-        Create a box plot to analyze the distribution of Bechdel test ratings across different categories.
-        """
-        # Clean the data by replacing 'None' and 'NaN' in bechdel_rating with a default value or category
-        self.df[bechdel_col] = self.df[bechdel_col].replace({None: 'Unknown', np.nan: 'Unknown'})
-            
-        # Replace 'NaN' and '<NA>' in category with 'Unknown'
-        self.df[category_col] = self.df[category_col].replace({np.nan: 'Unknown', '<NA>': 'Unknown'})
-
-        # Create a box plot
-        plt.figure(figsize=(12, 8))
-        sns.boxplot(x=category_col, y=bechdel_col, data=self.df, palette="Set3")
-
-        # Label the plot
-        plt.title('Bechdel Rating Distribution by Category')
-        plt.xlabel('Category')
-        plt.ylabel('Bechdel Rating')
-
-        # Show the plot
-        plt.show()
-
-
     
     def proportion_in_top_box_office(self, column, hue):
-        # 选择票房前100的电影
+        """
+        Displays a side-by-side bar chart showing the proportion of movies in top box office categorized by specified column and hue.
+
+        Parameters:
+        column (str): The name of the main DataFrame column to categorize data on the x-axis.
+        hue (str): The name of the DataFrame column to create subcategories within the main category.
+
+        Returns:
+        None: This method displays the plot and does not return any value.
+        """
         top_100 = self.df.nlargest(100, 'box_office')
         
-        # 创建一个带有两个子图的图表布局
-        fig, axes = plt.subplots(1, 2, figsize=(24, 8))  # 两个子图并排
+        fig, axes = plt.subplots(1, 2, figsize=(24, 8)) 
 
-        # 使用 Matplotlib 创建分组条形图
         grouped_data = top_100.groupby([column, hue]).size().unstack().fillna(0)
         grouped_data.plot(kind='bar', stacked=False, color=['skyblue', 'lightgreen'], ax=axes[0])
         axes[0].set_title(f'Proportion of {column.capitalize()} and {hue.capitalize()} in Top 100 Box Office Movies - Matplotlib')
@@ -105,7 +87,6 @@ class Inference:
         axes[0].tick_params(axis='x', rotation=45)
         axes[0].legend(title=hue.capitalize())
 
-        # 使用 Seaborn 创建分组条形图
         sns.countplot(x=column, hue=hue, data=top_100, palette='Set2', ax=axes[1])
         axes[1].set_title(f'Proportion of {column.capitalize()} and {hue.capitalize()} in Top 100 Box Office Movies - Seaborn')
         axes[1].set_xlabel(column.capitalize())

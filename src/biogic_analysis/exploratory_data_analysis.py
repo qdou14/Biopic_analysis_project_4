@@ -8,6 +8,13 @@ class EDA:
 
     Attributes:
         df (pd.DataFrame): A pandas DataFrame containing the data for analysis.
+
+    Methods:
+        - __init__(self, df): Initialize the EDA class with a DataFrame.
+        - unique_value_counts(self, column_name): Return counts of unique values in a specified column.
+        - combined_category_plot(self, type_col, category_col): Create stacked bar plots using Matplotlib and Seaborn.
+        - describe_stats(self, column_name): Provide descriptive statistics for a specified column.
+        - column_boxplot(self, x_column, y_column, hue): Create a boxplot for specified columns.
     """
     def __init__(self, df):
         """
