@@ -4,6 +4,21 @@ import seaborn as sns
 import pandas as pd
 
 class Inference:
+    """
+    A class to perform various data visualization inferences on a movie dataset.
+
+    Attributes:
+    df (DataFrame): A pandas DataFrame containing movie data with attributes such as box office, 
+                    diversity categories, year of release, etc.
+
+    Methods:
+    bechdel_test_plot(subject_col, bechdel_col): Generates a horizontal bar plot showing the percentage of movies that pass or fail the Bechdel test by specified subject categories.
+    bechdel_category_boxplot(category_col, bechdel_col): Creates a box plot to analyze the distribution of Bechdel test ratings across different categories.
+    proportion_in_top_box_office(column, hue): Displays a side-by-side bar chart showing the proportion of movies in top box office categorized by specified column and hue.
+    box_office_diversity_correlation(): Visualizes the correlation between diversity categories and box office performance using scatter plots.
+    diversity_trends_over_time(): Analyzes and visualizes the trends in movie diversity over time with line plots.
+    """
+    
     def __init__(self, df):
         """
         Initialize the Inference class with a DataFrame containing movie data.
@@ -14,43 +29,90 @@ class Inference:
         """
         self.df = df
 
-
-
-    def proportion_in_top_box_office(self, column, hue):
+    def bechdel_test_plot(self, subject_col='type_of_subject', bechdel_col='bechdel_rating'):
         """
-        Generate grouped bar charts showing the proportion of movies within specified 
-        categories and subcategories in the top 100 box office movies using Matplotlib and Seaborn.
+        Generates a horizontal bar plot showing the percentage of movies that pass or fail the Bechdel test by specified subject categories.
 
         Parameters:
-        - column (str): The name of the main DataFrame column to categorize data on the x-axis.
-        - hue (str): The name of the DataFrame column to create subcategories within the main category.
+        subject_col (str): The name of the DataFrame column to categorize data on the y-axis.
+        bechdel_col (str): The name of the DataFrame column containing Bechdel test ratings.
 
         Returns:
-        - None: This method displays the plot and does not return any value.
+        None
         """
-        # Select the top 100 movies by box office
+        # Convert numerical ratings to 'Pass' or 'Fail'
+        self.df[bechdel_col] = self.df[bechdel_col].apply(lambda x: 'Pass' if x == 3 else 'Fail' if x in [1, 2] else None)
+
+        # Drop rows where bechdel_rating is None
+        df_cleaned = self.df.dropna(subset=[bechdel_col])
+
+        # Group by subject_col and bechdel_col, then unstack to prepare for the percentage calculation
+        bechdel_summary = df_cleaned.groupby([subject_col, bechdel_col]).size().unstack().fillna(0)
+        bechdel_summary['Total'] = bechdel_summary.sum(axis=1)
+        bechdel_summary['Passed'] = (bechdel_summary.get('Pass', 0) / bechdel_summary['Total']) * 100
+        bechdel_summary['Failed'] = (bechdel_summary.get('Fail', 0) / bechdel_summary['Total']) * 100
+        
+        # Sorting by the total number for better visibility
+        bechdel_summary = bechdel_summary.sort_values(by='Total', ascending=False)
+        
+        # Plotting
+        plt.figure(figsize=(10, 8))
+        bechdel_summary[['Failed', 'Passed']].plot(kind='barh', stacked=True, color=['grey', 'lightblue'], figsize=(10, 8))
+        plt.xlabel('Percentage')
+        plt.ylabel(subject_col)
+        plt.title('Bechdel Test Performance by ' + subject_col)
+        plt.legend(title='Bechdel test', loc='lower right')
+        plt.gca().invert_yaxis()  # To match the example's layout
+        plt.show()
+
+    def bechdel_category_boxplot(self, category_col='category', bechdel_col='type_of_subject'):
+        """
+        Create a box plot to analyze the distribution of Bechdel test ratings across different categories.
+        """
+        # Clean the data by replacing 'None' and 'NaN' in bechdel_rating with a default value or category
+        self.df[bechdel_col] = self.df[bechdel_col].replace({None: 'Unknown', np.nan: 'Unknown'})
+            
+        # Replace 'NaN' and '<NA>' in category with 'Unknown'
+        self.df[category_col] = self.df[category_col].replace({np.nan: 'Unknown', '<NA>': 'Unknown'})
+
+        # Create a box plot
+        plt.figure(figsize=(12, 8))
+        sns.boxplot(x=category_col, y=bechdel_col, data=self.df, palette="Set3")
+
+        # Label the plot
+        plt.title('Bechdel Rating Distribution by Category')
+        plt.xlabel('Category')
+        plt.ylabel('Bechdel Rating')
+
+        # Show the plot
+        plt.show()
+
+
+    
+    def proportion_in_top_box_office(self, column, hue):
+        # 选择票房前100的电影
         top_100 = self.df.nlargest(100, 'box_office')
         
-        # Use Matplotlib to create a grouped bar chart
-        plt.figure(figsize=(12, 8))
+        # 创建一个带有两个子图的图表布局
+        fig, axes = plt.subplots(1, 2, figsize=(24, 8))  # 两个子图并排
+
+        # 使用 Matplotlib 创建分组条形图
         grouped_data = top_100.groupby([column, hue]).size().unstack().fillna(0)
-        grouped_data.plot(kind='bar', stacked=False, color=['skyblue', 'lightgreen'])
-        plt.title(f'Proportion of {column.capitalize()} and {hue.capitalize()} in Top 100 Box Office Movies - Matplotlib')
-        plt.xlabel(column.capitalize())
-        plt.ylabel('Number of Movies')
-        plt.xticks(rotation=45)
-        plt.legend(title=hue.capitalize())
-        plt.tight_layout()
-        plt.show()
-        
-        # Use Seaborn to create a grouped bar chart
-        plt.figure(figsize=(12, 8))
-        sns.countplot(x=column, hue=hue, data=top_100, palette='Set2')
-        plt.title(f'Proportion of {column.capitalize()} and {hue.capitalize()} in Top 100 Box Office Movies - Seaborn')
-        plt.xlabel(column.capitalize())
-        plt.ylabel('Count')
-        plt.xticks(rotation=45)
-        plt.legend(title=hue.capitalize())
+        grouped_data.plot(kind='bar', stacked=False, color=['skyblue', 'lightgreen'], ax=axes[0])
+        axes[0].set_title(f'Proportion of {column.capitalize()} and {hue.capitalize()} in Top 100 Box Office Movies - Matplotlib')
+        axes[0].set_xlabel(column.capitalize())
+        axes[0].set_ylabel('Number of Movies')
+        axes[0].tick_params(axis='x', rotation=45)
+        axes[0].legend(title=hue.capitalize())
+
+        # 使用 Seaborn 创建分组条形图
+        sns.countplot(x=column, hue=hue, data=top_100, palette='Set2', ax=axes[1])
+        axes[1].set_title(f'Proportion of {column.capitalize()} and {hue.capitalize()} in Top 100 Box Office Movies - Seaborn')
+        axes[1].set_xlabel(column.capitalize())
+        axes[1].set_ylabel('Count')
+        axes[1].tick_params(axis='x', rotation=45)
+        axes[1].legend(title=hue.capitalize())
+
         plt.tight_layout()
         plt.show()
 
