@@ -1,14 +1,14 @@
-from src.biogic_analysis.data_summary import DataProcess
-from src.biogic_analysis.exploratory_data_analysis import EDA
-from src.biogic_analysis.inference import Inference
+from .data_summary import DataProcess
+from .exploratory_data_analysis import EDA
+from .inference import Inference
 
 
 def main():
     """
-    Run biogic analysis as a script.
+    Run biopic analysis as a script.
     """
     print("------------------------------------------------")
-    print("Biogic_Analysis")
+    print("Biopic_Analysis")
     print("------------------------------------------------")
 
     data_summary()
