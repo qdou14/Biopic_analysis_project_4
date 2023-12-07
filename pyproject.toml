@@ -1,6 +1,6 @@
 [tool.poetry]
-name = "biogic_analysis"
-version = "0.2.0"
+name = "biopic_analysis"
+version = "0.4.0"
 description = "An analysis of diversity in biopics."
 authors = ["Qing Dou <qdou@mail.yu.edu>"]
 license = "MIT"
@@ -22,7 +22,7 @@ pytest = "^6.2"
 where = ["src"]
 
 [tool.setuptools.package-data]
-biogic_analysis = ["*"]
+biopic_analysis = ["*"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

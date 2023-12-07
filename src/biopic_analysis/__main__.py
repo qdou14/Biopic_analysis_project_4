@@ -1,6 +1,7 @@
 from .data_summary import DataProcess
 from .exploratory_data_analysis import EDA
 from .inference import Inference
+from .building_model import ModelBuildin
 
 
 def main():
@@ -22,28 +23,29 @@ def main():
 def data_summary():
     data_url = 'https://raw.githubusercontent.com/qdou14/biopic_analysis/main/dataset/biopics_dataset.csv'
     data_processor = DataProcess(data_url)
-    df = data_processor.get_data()
-    print(df.head())
+    df = data_processor.merge_movie_data('https://raw.githubusercontent.com/qdou14/Biopic_analysis_project_4/main/movie_data.csv')
+    df.head()
 
     column_types = df.dtypes
-    print(column_types)
+    column_types
 
     data_processor.convert_box_office()
-    
-    data_processor.update_dataframe_with_bechdel()
-    
+
+    # Add a 'category' column.
     data_processor.add_category()
-    
     data_processor.get_data().head()
+
+    data_processor.check_data()
 
 def exploratory_data_analysis():
     data_url = 'https://raw.githubusercontent.com/qdou14/biopic_analysis/main/dataset/biopics_dataset.csv'
     data_processor = DataProcess(data_url)
+    df = data_processor.merge_movie_data('https://raw.githubusercontent.com/qdou14/Biopic_analysis_project_4/main/movie_data.csv')
     data_processor.convert_box_office()
-    data_processor.update_dataframe_with_bechdel()
-    data_processor.add_category()
-    df = data_processor.get_data()
+    df=data_processor.add_category()
     eda = EDA(df)
+    
+    data_processor.describe_categorical()
     while True:
             eda.unique_value_counts('subject_race')
 
@@ -53,13 +55,7 @@ def exploratory_data_analysis():
 
             eda.combined_category_plot('type_of_subject', 'category')
 
-            country_bechdel_rating = eda.unique_value_counts('bechdel_rating')
-
-            eda.combined_category_plot('bechdel_rating', 'category')
-
             eda.combined_category_plot('year_release', 'category')
-
-            eda.column_boxplot('year_release', 'category')
 
             box_office_stats = eda.describe_stats('box_office')
 
@@ -69,19 +65,14 @@ def exploratory_data_analysis():
     def inferences():
         data_url = 'https://raw.githubusercontent.com/qdou14/biopic_analysis/main/dataset/biopics_dataset.csv'
         data_processor = DataProcess(data_url)
+        df = data_processor.merge_movie_data('https://raw.githubusercontent.com/qdou14/Biopic_analysis_project_4/main/movie_data.csv')
         data_processor.convert_box_office()
-        data_processor.update_dataframe_with_bechdel()
-        data_processor.add_category()
-        df = data_processor.get_data()
+        df=data_processor.add_category()
         inference_analysis = Inference(df)
         while True:
-            inference_analysis.bechdel_test_plot('type_of_subject', 'bechdel_rating')
 
             inference_analysis.proportion_in_top_box_office('subject_race', 'subject_sex')
 
             inference_analysis.box_office_diversity_correlation()
-
-            inference_analysis.diversity_trends_over_time()
-
 
     main()

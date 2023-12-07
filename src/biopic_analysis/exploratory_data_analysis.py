@@ -123,24 +123,6 @@ class EDA:
             plt.legend(title=hue)
         plt.show()
 
-    def scatter_plot(self, columns):
-        """
-        Generate a scatter plot based on two columns.
-
-        Args:
-        - columns (list): List of two columns for x and y axes.
-        """
-        plt.figure(figsize=(10, 6))
-
-        sns.scatterplot(data=self.df, x=columns[0], y=columns[1])
-
-        plt.title(f"Scatter Plot of {columns[0]} vs {columns[1]}")
-        plt.xlabel(columns[0])
-        plt.ylabel(columns[1])
-
-        plt.tight_layout()
-        plt.show()
-
     
     
 
